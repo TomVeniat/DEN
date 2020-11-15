@@ -589,7 +589,7 @@ class DEN(object):
                                             })
                 loss_window.append(val_loss)
                 mean_loss = sum(loss_window) / float(window_size)
-                val_perf = self.get_performance(val_preds, self.valY)
+                val_perf = self.get_acc(val_preds, self.valY)
 
                 if print_pred == True:
                     print(" [*] iter: %d, val loss: %.4f, val perf: %.4f"%(c_iter, val_loss, val_perf))
@@ -610,13 +610,16 @@ class DEN(object):
         else:
             return X, Y
 
-    def get_performance(self, p, y):
+    def get_acc(self, p, y):
+        return accuracy(p, y)
+
+    def get_auc(self, p, y):
 
         perf_list = []
         for _i in range(self.n_classes):
             roc, perf = ROC_AUC(p[:,_i], y[:,_i])
             perf_list.append(perf)
- 
+
         return np.mean(perf_list)
 
     def predict_perform(self, task_id, X, Y, task_name = None):
@@ -626,7 +629,7 @@ class DEN(object):
         self.sess.run(tf.global_variables_initializer())
 
         test_preds = self.sess.run(self.yhat, feed_dict = {self.X: X})
-        test_perf = self.get_performance(test_preds, Y)
+        test_perf = self.get_acc(test_preds, Y)
 
         if task_name == None:
             task_name = task_id

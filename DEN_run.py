@@ -109,7 +109,7 @@ for t in range(FLAGS.n_classes):
 			test_set = (testXs[j], mnist.test.labels)
 		temp_perf = model.predict_perform(j+1, *test_set)
 		temp_perfs.append(temp_perf)
-	avg_perf.append( sum(temp_perfs) / float(t+1) )
+	avg_perf.append(sum(temp_perfs) / float(t+1))
 	print("   [*] avg_perf: %.4f"%avg_perf[t])
 	model.destroy_graph()
 	model.sess.close()
