@@ -23,8 +23,8 @@ flags.DEFINE_integer("ex_k", 10, "The number of units increased in the expansion
 flags.DEFINE_float('loss_thr', 0.01, "Threshold of dynamic expansion")
 flags.DEFINE_float('spl_thr', 0.05, "Threshold of split and duplication")
 
-flags.DEFINE_string('load_from', '2968', "Directory path to save the checkpoints")
-# flags.DEFINE_string('load_from', '1978', "Directory path to save the checkpoints")
+# flags.DEFINE_string('load_from', '2968', "Directory path to save the checkpoints")
+flags.DEFINE_string('load_from', '1978', "Directory path to save the checkpoints")
 FLAGS = flags.FLAGS
 
 if FLAGS.load_from is not None:
@@ -45,13 +45,12 @@ if FLAGS.load_from is not None:
 			loaded_x, loaded_y = torch.load(path.format(tid=task, split=k))
 			if mean is None:
 				assert k == 'train'
-				train_s = loaded_x.view(loaded_x.shape[0], loaded_x.shape[1], -1)
-				mean = train_s.mean(2).mean(0)
-				std = train_s.std(2).mean(0)
+				train_s = loaded_x.view(loaded_x.shape[0], -1)
+				mean = train_s.mean()
+				std = train_s.std()
 			# tensor.sub_(mean[:, None, None]).div_(std[:, None, None])
 
-			loaded_x = loaded_x.sub(mean[None, :, None, None])\
-				.div(std[None, :, None, None])
+			loaded_x = loaded_x.sub(mean).div(std)
 			loaded_x = loaded_x.view(loaded_x.size(0), -1)
 			loaded_y = loaded_y
 			y = torch.zeros(loaded_x.size(0), 10)
@@ -85,6 +84,9 @@ for t in range(FLAGS.n_classes):
 	else:
 		data = (trainXs[t], mnist.train.labels, valXs[t], mnist.validation.labels, testXs[t], mnist.test.labels)
 	model.sess = tf.Session()
+	print(data[0].mean(), data[0].std())
+	print(data[1].mean(), data[1].std())
+	print(data[2].mean(), data[2].std())
 	print("\n\n\tTASK %d TRAINING\n"%(t+1))
 
 	model.T = model.T+1
