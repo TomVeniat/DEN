@@ -24,6 +24,7 @@ flags.DEFINE_float('loss_thr', 0.01, "Threshold of dynamic expansion")
 flags.DEFINE_float('spl_thr', 0.05, "Threshold of split and duplication")
 
 flags.DEFINE_string('load_from', '2968', "Directory path to save the checkpoints")
+# flags.DEFINE_string('load_from', '1978', "Directory path to save the checkpoints")
 FLAGS = flags.FLAGS
 
 if FLAGS.load_from is not None:
@@ -38,8 +39,19 @@ if FLAGS.load_from is not None:
 		test=[],
 	)
 	for task in range(10):
+		mean = None
+		std = None
 		for k, v in Xs.items():
 			loaded_x, loaded_y = torch.load(path.format(tid=task, split=k))
+			if mean is None:
+				assert k == 'train'
+				train_s = loaded_x.view(loaded_x.shape[0], loaded_x.shape[1], -1)
+				mean = train_s.mean(2).mean(0)
+				std = train_s.std(2).mean(0)
+			# tensor.sub_(mean[:, None, None]).div_(std[:, None, None])
+
+			loaded_x = loaded_x.sub(mean[None, :, None, None])\
+				.div(std[None, :, None, None])
 			loaded_x = loaded_x.view(loaded_x.size(0), -1)
 			loaded_y = loaded_y
 			y = torch.zeros(loaded_x.size(0), 10)
