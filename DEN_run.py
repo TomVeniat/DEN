@@ -23,8 +23,8 @@ flags.DEFINE_integer("ex_k", 10, "The number of units increased in the expansion
 flags.DEFINE_float('loss_thr', 0.01, "Threshold of dynamic expansion")
 flags.DEFINE_float('spl_thr', 0.05, "Threshold of split and duplication")
 
-# flags.DEFINE_string('load_from', '2968', "Directory path to save the checkpoints")
-flags.DEFINE_string('load_from', '1978', "Directory path to save the checkpoints")
+flags.DEFINE_string('load_from', None, "Directory path to save the checkpoints")
+# flags.DEFINE_string('load_from', '1978', "Directory path to save the checkpoints")
 FLAGS = flags.FLAGS
 
 if FLAGS.load_from is not None:
